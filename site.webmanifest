@@ -1,0 +1,14 @@
+{
+  "name": "Ceiling 2 Cellar Remodeling",
+  "short_name": "C2C",
+  "description": "Remodeling and home improvement services for Western New York homeowners.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f1ea",
+  "theme_color": "#0b3d2e",
+  "icons": [
+    { "src": "assets/images/favicon-32x32.png", "sizes": "32x32", "type": "image/png" },
+    { "src": "assets/images/favicon-16x16.png", "sizes": "16x16", "type": "image/png" },
+    { "src": "assets/images/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}
