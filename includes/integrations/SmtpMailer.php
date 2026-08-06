@@ -18,7 +18,7 @@ final class SmtpMailer
         array $attachments = []
     ): void {
         if (!$this->isConfigured()) {
-            throw new RuntimeException('SMTP credentials are not configured.');
+            throw new RuntimeException('SMTP credentials or recipient address are not configured.');
         }
 
         $autoload = dirname(__DIR__, 2) . '/vendor/autoload.php';
@@ -27,6 +27,7 @@ final class SmtpMailer
         }
         require_once $autoload;
 
+        $smtpDebug = '';
         try {
             $mail = new PHPMailer(true);
             $mail->isSMTP();
@@ -35,10 +36,15 @@ final class SmtpMailer
             $mail->Username = SMTP_USERNAME;
             $mail->Password = SMTP_PASSWORD;
             $mail->Port = SMTP_PORT;
-            $mail->Timeout = 20;
+            $mail->Timeout = 30;
+            $mail->Timelimit = 30;
             $mail->CharSet = 'UTF-8';
             $mail->Encoding = 'base64';
             $mail->SMTPAutoTLS = true;
+            $mail->SMTPDebug = 2;
+            $mail->Debugoutput = static function (string $message, int $level) use (&$smtpDebug): void {
+                $smtpDebug .= '[' . $level . '] ' . trim($message) . "\n";
+            };
 
             $encryption = strtolower((string) SMTP_ENCRYPTION);
             if ($encryption === 'ssl' || $encryption === 'smtps') {
@@ -52,7 +58,7 @@ final class SmtpMailer
 
             $mail->setFrom(MAIL_FROM_ADDRESS, MAIL_FROM_NAME);
             $mail->addAddress($toEmail, $toName);
-            if ($replyToEmail !== '') {
+            if ($replyToEmail !== '' && filter_var($replyToEmail, FILTER_VALIDATE_EMAIL)) {
                 $mail->addReplyTo($replyToEmail, $replyToName);
             }
             foreach ($attachments as $attachment) {
@@ -67,7 +73,12 @@ final class SmtpMailer
             $mail->AltBody = $text;
             $mail->send();
         } catch (MailException $e) {
-            throw new RuntimeException('SMTP delivery failed: ' . $e->getMessage(), 0, $e);
+            $debug = trim($smtpDebug);
+            throw new RuntimeException(
+                'SMTP delivery failed: ' . $e->getMessage() . ($debug !== '' ? ' | SMTP trace: ' . $debug : ''),
+                0,
+                $e
+            );
         }
     }
 
@@ -77,7 +88,7 @@ final class SmtpMailer
             && SMTP_HOST !== ''
             && SMTP_USERNAME !== ''
             && SMTP_PASSWORD !== ''
-            && MAIL_FROM_ADDRESS !== ''
+            && filter_var(MAIL_FROM_ADDRESS, FILTER_VALIDATE_EMAIL)
             && !str_contains(SMTP_PASSWORD, 'REPLACE_WITH');
     }
 }
