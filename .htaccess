@@ -37,3 +37,5 @@ RewriteRule ^ %1 [R=301,L]
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME}\.php -f
 RewriteRule ^([^/]+)$ $1.php [NC,L]
+# Dynamic sitemap so localhost is never hard-coded on production.
+RewriteRule ^sitemap\.xml$ sitemap.php [L]

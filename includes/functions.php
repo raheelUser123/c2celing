@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__ . '/../config.php';
 function e(?string $value): string { return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8'); }
-function url(string $path=''): string { return rtrim(SITE_URL,'/') . '/' . ltrim($path,'/'); }
+function url(string $path=''): string { $base = trim((string) SITE_URL) !== '' ? rtrim((string) SITE_URL, '/') : rtrim(detected_site_url(), '/'); return $base . ($path !== '' ? '/' . ltrim($path, '/') : '/'); }
 function current_page(): string { return basename($_SERVER['PHP_SELF'] ?? 'index.php'); }
 function active(string ...$pages): string { return in_array(current_page(), $pages, true) ? ' active' : ''; }
 function icon(string $name): string {

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
-
-Sitemap: http://localhost/c2c-custom-php/sitemap.xml
+Disallow: /storage/
+Disallow: /uploads/
