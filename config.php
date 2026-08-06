@@ -66,7 +66,7 @@ if (!defined('SMTP_ENABLED')) define('SMTP_ENABLED', env_value('SMTP_ENABLED', '
 // ClickUp placeholders
 if (!defined('CLICKUP_ENABLED')) define('CLICKUP_ENABLED', env_value('CLICKUP_ENABLED', '1') === '1');
 if (!defined('CLICKUP_API_TOKEN')) define('CLICKUP_API_TOKEN', env_value('CLICKUP_API_TOKEN', 'pk_87315537_KLOCR5UYJQE40QBQCZZ06WXGOR2GGVUS'));
-if (!defined('CLICKUP_LIST_ID')) define('CLICKUP_LIST_ID', env_value('CLICKUP_LIST_ID', '901108518949'));
+if (!defined('CLICKUP_LIST_ID')) define('CLICKUP_LIST_ID', env_value('CLICKUP_LIST_ID', '901715880570'));
 if (!defined('CLICKUP_DEFAULT_ASSIGNEE_ID')) define('CLICKUP_DEFAULT_ASSIGNEE_ID', env_value('CLICKUP_DEFAULT_ASSIGNEE_ID', ''));
 if (!defined('CLICKUP_DEFAULT_TAG')) define('CLICKUP_DEFAULT_TAG', env_value('CLICKUP_DEFAULT_TAG', 'c2c-website-lead'));
 if (!defined('CLICKUP_STATUS')) define('CLICKUP_STATUS', env_value('CLICKUP_STATUS', ''));

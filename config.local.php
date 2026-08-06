@@ -25,7 +25,7 @@ define('MAIL_REPLY_TO', 'info@ceiling2cellar.com');
 // ClickUp
 define('CLICKUP_ENABLED', true);
 define('CLICKUP_API_TOKEN', 'pk_87315537_KLOCR5UYJQE40QBQCZZ06WXGOR2GGVUS');
-define('CLICKUP_LIST_ID', '901108518949');
+define('CLICKUP_LIST_ID', '901715880570');
 define('CLICKUP_DEFAULT_ASSIGNEE_ID', '');
 define('CLICKUP_DEFAULT_TAG', 'c2c-website-lead');
 define('CLICKUP_STATUS', '');
