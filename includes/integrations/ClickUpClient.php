@@ -15,8 +15,7 @@ final class ClickUpClient
 
     public function isConfigured(): bool
     {
-        return $this->token !== ''
-            && $this->listId !== ''
+        return $this->token !== '' && $this->listId !== ''
             && !str_contains($this->token, 'REPLACE_WITH')
             && !str_contains($this->listId, 'REPLACE_WITH');
     }
@@ -24,56 +23,42 @@ final class ClickUpClient
     /** @return array{id:string,url:string,raw:array} */
     public function createLeadTask(array $lead): array
     {
-        $taskName = sprintf(
-            '%s Lead - %s - %s',
-            $lead['mode'] === 'estimate' ? 'Estimate' : 'Consult',
-            $lead['full_name'],
-            $lead['project_type']
-        );
+        if (!extension_loaded('curl')) {
+            throw new RuntimeException('PHP cURL extension is not enabled.');
+        }
 
-        // Create the task with only universally supported fields. Tags and
-        // optional metadata are applied after creation so they cannot block a lead.
         $payload = [
-            'name' => $taskName,
+            'name' => sprintf(
+                '%s Lead - %s - %s',
+                $lead['mode'] === 'estimate' ? 'Estimate' : 'Consult',
+                $lead['full_name'],
+                $lead['project_type']
+            ),
             'description' => $this->buildDescription($lead),
-            'priority' => CLICKUP_PRIORITY,
         ];
 
-        if (CLICKUP_DEFAULT_ASSIGNEE_ID !== '') {
-            $payload['assignees'] = [(int) CLICKUP_DEFAULT_ASSIGNEE_ID];
-        }
-        if (CLICKUP_STATUS !== '') {
-            $payload['status'] = CLICKUP_STATUS;
-        }
-
-        $customFields = [];
-        foreach ([
-            CLICKUP_FIELD_SERVICE => $lead['project_type'],
-            CLICKUP_FIELD_BUDGET => $lead['budget'],
-            CLICKUP_FIELD_SOURCE => $lead['source'],
-            CLICKUP_FIELD_LEAD_TYPE => $lead['mode'],
-        ] as $fieldId => $value) {
-            if ($fieldId !== '' && $value !== '') {
-                $customFields[] = ['id' => $fieldId, 'value' => $value];
-            }
-        }
-        if ($customFields !== []) {
-            $payload['custom_fields'] = $customFields;
-        }
-
-        $response = $this->request(
-            'POST',
-            '/list/' . rawurlencode($this->listId) . '/task',
-            $payload
-        );
-
-        $taskId = (string) ($response['id'] ?? '');
+        // Keep the first request deliberately minimal. Invalid statuses,
+        // assignees, tags or custom field IDs must never block task creation.
+        $response = $this->request('POST', '/list/' . rawurlencode($this->listId) . '/task', $payload);
+        $taskId = (string)($response['id'] ?? '');
         if ($taskId === '') {
-            throw new RuntimeException('ClickUp created no task ID.');
+            throw new RuntimeException('ClickUp did not return a task ID.');
+        }
+
+        // Optional properties are applied after the task exists.
+        $updates = [];
+        if (defined('CLICKUP_PRIORITY') && CLICKUP_PRIORITY >= 1 && CLICKUP_PRIORITY <= 4) {
+            $updates['priority'] = CLICKUP_PRIORITY;
+        }
+        if (defined('CLICKUP_DEFAULT_ASSIGNEE_ID') && CLICKUP_DEFAULT_ASSIGNEE_ID !== '') {
+            $updates['assignees'] = ['add' => [(int)CLICKUP_DEFAULT_ASSIGNEE_ID]];
+        }
+        if ($updates !== []) {
+            try { $this->request('PUT', '/task/' . rawurlencode($taskId), $updates); } catch (Throwable $ignored) {}
         }
 
         $tags = array_values(array_unique(array_filter([
-            CLICKUP_DEFAULT_TAG,
+            defined('CLICKUP_DEFAULT_TAG') ? CLICKUP_DEFAULT_TAG : '',
             'website-lead',
             $lead['mode'] . '-lead',
             str_replace('_', '-', $lead['route_tag']),
@@ -81,35 +66,24 @@ final class ClickUpClient
         foreach ($tags as $tag) {
             try {
                 $this->request('POST', '/task/' . rawurlencode($taskId) . '/tag/' . rawurlencode($tag), []);
-            } catch (Throwable $ignored) {
-                // A missing Space tag must never prevent task creation.
-            }
+            } catch (Throwable $ignored) {}
         }
 
-        return [
-            'id' => $taskId,
-            'url' => (string) ($response['url'] ?? ''),
-            'raw' => $response,
-        ];
+        return ['id' => $taskId, 'url' => (string)($response['url'] ?? ''), 'raw' => $response];
     }
 
     public function attachFiles(string $taskId, array $absolutePaths): array
     {
-        $valid = array_values(array_filter($absolutePaths, static fn(string $path): bool => is_file($path)));
-        if ($valid === []) {
-            return [];
-        }
-
-        $postFields = [];
-        foreach ($valid as $index => $path) {
+        $results = [];
+        foreach ($absolutePaths as $path) {
+            if (!is_file($path)) continue;
             $mime = mime_content_type($path) ?: 'application/octet-stream';
-            $postFields['attachment[' . $index . ']'] = new CURLFile($path, $mime, basename($path));
+            $results[] = $this->requestMultipart(
+                '/task/' . rawurlencode($taskId) . '/attachment',
+                ['attachment' => new CURLFile($path, $mime, basename($path))]
+            );
         }
-
-        return $this->requestMultipart(
-            '/task/' . rawurlencode($taskId) . '/attachment',
-            $postFields
-        );
+        return $results;
     }
 
     private function buildDescription(array $lead): string
@@ -132,7 +106,6 @@ final class ClickUpClient
             'Lead ID' => $lead['lead_id'],
             'Page' => $lead['page_url'],
         ];
-
         $lines = ['Website lead received', ''];
         foreach ($labels as $label => $value) {
             $lines[] = $label . ': ' . ($value !== '' ? $value : 'Not provided');
@@ -147,9 +120,7 @@ final class ClickUpClient
     private function request(string $method, string $path, array $payload): array
     {
         $ch = curl_init($this->baseUrl . $path);
-        if ($ch === false) {
-            throw new RuntimeException('Unable to initialize ClickUp request.');
-        }
+        if ($ch === false) throw new RuntimeException('Unable to initialize ClickUp request.');
         curl_setopt_array($ch, [
             CURLOPT_CUSTOMREQUEST => $method,
             CURLOPT_POSTFIELDS => json_encode($payload, JSON_UNESCAPED_SLASHES),
@@ -159,8 +130,10 @@ final class ClickUpClient
                 'Content-Type: application/json',
             ],
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_CONNECTTIMEOUT => 8,
-            CURLOPT_TIMEOUT => 20,
+            CURLOPT_CONNECTTIMEOUT => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_SSL_VERIFYPEER => true,
         ]);
         return $this->execute($ch);
     }
@@ -168,19 +141,15 @@ final class ClickUpClient
     private function requestMultipart(string $path, array $postFields): array
     {
         $ch = curl_init($this->baseUrl . $path);
-        if ($ch === false) {
-            throw new RuntimeException('Unable to initialize ClickUp attachment request.');
-        }
+        if ($ch === false) throw new RuntimeException('Unable to initialize ClickUp attachment request.');
         curl_setopt_array($ch, [
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => $postFields,
-            CURLOPT_HTTPHEADER => [
-                'Authorization: ' . $this->token,
-                'Accept: application/json',
-            ],
+            CURLOPT_HTTPHEADER => ['Authorization: ' . $this->token, 'Accept: application/json'],
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_CONNECTTIMEOUT => 8,
+            CURLOPT_CONNECTTIMEOUT => 10,
             CURLOPT_TIMEOUT => 60,
+            CURLOPT_SSL_VERIFYPEER => true,
         ]);
         return $this->execute($ch);
     }
@@ -188,19 +157,14 @@ final class ClickUpClient
     private function execute($ch): array
     {
         $body = curl_exec($ch);
-        $status = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+        $status = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
         $error = curl_error($ch);
         curl_close($ch);
-
-        if ($body === false) {
-            throw new RuntimeException('ClickUp network error: ' . $error);
-        }
-        $decoded = json_decode($body, true);
+        if ($body === false) throw new RuntimeException('ClickUp network error: ' . $error);
+        $decoded = json_decode((string)$body, true);
         if ($status < 200 || $status >= 300) {
-            $message = is_array($decoded)
-                ? (string) ($decoded['err'] ?? $decoded['message'] ?? $body)
-                : $body;
-            throw new RuntimeException('ClickUp API error (' . $status . '): ' . $message);
+            $message = is_array($decoded) ? (string)($decoded['err'] ?? $decoded['message'] ?? $body) : (string)$body;
+            throw new RuntimeException('ClickUp API error (' . $status . '): ' . trim($message));
         }
         return is_array($decoded) ? $decoded : [];
     }

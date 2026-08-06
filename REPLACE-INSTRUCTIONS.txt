@@ -1,0 +1,22 @@
+Replace these files in the same folders:
+
+handlers/submit-lead.php
+includes/integrations/SmtpMailer.php
+includes/integrations/ClickUpClient.php
+assets/js/main.js
+integration-test.php
+
+Do not replace config.local.php. Your existing SMTP and ClickUp keys remain there.
+
+After upload:
+1. Clear Hostinger cache and browser cache.
+2. Open /integration-test.php once.
+3. It prints the exact SMTP and ClickUp error or SUCCESS.
+4. Delete integration-test.php after testing.
+5. Check storage/logs/forms-YYYY-MM.log after a form submission.
+
+Required permissions:
+storage 775
+storage/logs 775
+storage/rate-limits 775
+uploads 775

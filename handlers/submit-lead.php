@@ -245,21 +245,22 @@ try {
     log_event('customer_email_error', ['lead_id' => $leadId, 'error' => $e->getMessage()]);
 }
 
-// A lead is never discarded. It is always saved locally first. In production,
-// report integration failures so the visitor can retry and the team can inspect logs.
-$integrationFailed = (CLICKUP_ENABLED && $clickUpTaskId === '') || (SMTP_ENABLED && count($emailErrors) === 2);
-if ($integrationFailed && APP_ENV === 'production') {
-    json_response(503, [
-        'ok' => false,
-        'message' => 'Your details were saved, but delivery is temporarily delayed. Please call ' . BUSINESS_PHONE . ' or try again in a few minutes.',
-        'lead_id' => $leadId,
-    ]);
-}
+// The lead has already been saved locally. Integration failures are logged but
+// must not make the visitor believe the form itself failed or create duplicates.
+log_event('lead_complete', [
+    'lead_id' => $leadId,
+    'clickup_ok' => $clickUpTaskId !== '',
+    'admin_email_ok' => !in_array(true, array_map(static fn(string $v): bool => str_starts_with($v, 'admin:'), $emailErrors), true),
+    'customer_email_ok' => !in_array(true, array_map(static fn(string $v): bool => str_starts_with($v, 'customer:'), $emailErrors), true),
+]);
 
 json_response(200, [
     'ok' => true,
     'lead_id' => $leadId,
     'redirect' => url($mode === 'estimate' ? 'thanks-estimate.php' : 'thanks-consult.php'),
+    'integration_warning' => ($clickUpError !== '' || $emailErrors !== [])
+        ? 'Lead saved. One or more background integrations need attention in storage/logs.'
+        : '',
     'debug' => DEBUG_MODE ? [
         'clickup_task_id' => $clickUpTaskId,
         'clickup_error' => $clickUpError,
