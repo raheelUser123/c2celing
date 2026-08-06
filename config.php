@@ -54,8 +54,8 @@ if (!defined('STORAGE_DIR')) define('STORAGE_DIR', __DIR__ . '/storage');
 if (!defined('SMTP_HOST')) define('SMTP_HOST', env_value('SMTP_HOST', 'smtp.hostinger.com'));
 if (!defined('SMTP_PORT')) define('SMTP_PORT', (int) env_value('SMTP_PORT', '465'));
 if (!defined('SMTP_ENCRYPTION')) define('SMTP_ENCRYPTION', env_value('SMTP_ENCRYPTION', 'ssl'));
-if (!defined('SMTP_USERNAME')) define('SMTP_USERNAME', env_value('SMTP_USERNAME', ''));
-if (!defined('SMTP_PASSWORD')) define('SMTP_PASSWORD', env_value('SMTP_PASSWORD', ''));
+if (!defined('SMTP_USERNAME')) define('SMTP_USERNAME', env_value('SMTP_USERNAME', 'info@ceiling2cellar.com'));
+if (!defined('SMTP_PASSWORD')) define('SMTP_PASSWORD', env_value('SMTP_PASSWORD', 'Celing123#@!'));
 if (!defined('MAIL_FROM_ADDRESS')) define('MAIL_FROM_ADDRESS', env_value('MAIL_FROM_ADDRESS', ''));
 if (!defined('MAIL_FROM_NAME')) define('MAIL_FROM_NAME', env_value('MAIL_FROM_NAME', 'Ceiling 2 Cellar Website'));
 if (!defined('MAIL_TO_ADDRESS')) define('MAIL_TO_ADDRESS', env_value('MAIL_TO_ADDRESS', ''));
@@ -65,8 +65,8 @@ if (!defined('SMTP_ENABLED')) define('SMTP_ENABLED', env_value('SMTP_ENABLED', '
 
 // ClickUp placeholders
 if (!defined('CLICKUP_ENABLED')) define('CLICKUP_ENABLED', env_value('CLICKUP_ENABLED', '1') === '1');
-if (!defined('CLICKUP_API_TOKEN')) define('CLICKUP_API_TOKEN', env_value('CLICKUP_API_TOKEN', ''));
-if (!defined('CLICKUP_LIST_ID')) define('CLICKUP_LIST_ID', env_value('CLICKUP_LIST_ID', ''));
+if (!defined('CLICKUP_API_TOKEN')) define('CLICKUP_API_TOKEN', env_value('CLICKUP_API_TOKEN', 'pk_87315537_KLOCR5UYJQE40QBQCZZ06WXGOR2GGVUS'));
+if (!defined('CLICKUP_LIST_ID')) define('CLICKUP_LIST_ID', env_value('CLICKUP_LIST_ID', '901108518949'));
 if (!defined('CLICKUP_DEFAULT_ASSIGNEE_ID')) define('CLICKUP_DEFAULT_ASSIGNEE_ID', env_value('CLICKUP_DEFAULT_ASSIGNEE_ID', ''));
 if (!defined('CLICKUP_DEFAULT_TAG')) define('CLICKUP_DEFAULT_TAG', env_value('CLICKUP_DEFAULT_TAG', 'c2c-website-lead'));
 if (!defined('CLICKUP_STATUS')) define('CLICKUP_STATUS', env_value('CLICKUP_STATUS', ''));
