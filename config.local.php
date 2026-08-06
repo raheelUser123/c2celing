@@ -18,7 +18,7 @@ define('SMTP_USERNAME', 'info@ceiling2cellar.com');
 define('SMTP_PASSWORD', 'Celing123#@!');
 define('MAIL_FROM_ADDRESS', 'info@ceiling2cellar.com');
 define('MAIL_FROM_NAME', 'Ceiling 2 Cellar Website');
-define('MAIL_TO_ADDRESS', 'REPLACE_WITH_LEAD_INBOX');
+define('MAIL_TO_ADDRESS', 'info@ceiling2cellar.com');
 define('MAIL_TO_NAME', 'Ceiling 2 Cellar Team');
 define('MAIL_REPLY_TO', 'info@ceiling2cellar.com');
 

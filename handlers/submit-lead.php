@@ -185,10 +185,20 @@ if (CLICKUP_ENABLED) {
         $task = $clickUp->createLeadTask($lead);
         $clickUpTaskId = $task['id'];
         $clickUpUrl = $task['url'];
+        log_event('clickup_success', [
+            'lead_id' => $leadId,
+            'task_id' => $clickUpTaskId,
+            'url' => $clickUpUrl,
+            'warnings' => $task['warnings'] ?? [],
+        ]);
         if ($savedAbsolute !== []) {
-            $clickUp->attachFiles($clickUpTaskId, $savedAbsolute);
+            try {
+                $clickUp->attachFiles($clickUpTaskId, $savedAbsolute);
+                log_event('clickup_attachments_success', ['lead_id' => $leadId, 'task_id' => $clickUpTaskId, 'count' => count($savedAbsolute)]);
+            } catch (Throwable $attachmentError) {
+                log_event('clickup_attachments_error', ['lead_id' => $leadId, 'task_id' => $clickUpTaskId, 'error' => $attachmentError->getMessage()]);
+            }
         }
-        log_event('clickup_success', ['lead_id' => $leadId, 'task_id' => $clickUpTaskId, 'url' => $clickUpUrl]);
     } catch (Throwable $e) {
         $clickUpError = $e->getMessage();
         log_event('clickup_error', ['lead_id' => $leadId, 'error' => $clickUpError]);
