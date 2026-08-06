@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>http://localhost/c2c-custom-php/</loc></url>
-  <url><loc>http://localhost/c2c-custom-php/about</loc></url>
-  <url><loc>http://localhost/c2c-custom-php/services</loc></url>
-  <url><loc>http://localhost/c2c-custom-php/basement</loc></url>
-  <url><loc>http://localhost/c2c-custom-php/kitchen</loc></url>
-  <url><loc>http://localhost/c2c-custom-php/bathroom</loc></url>
-  <url><loc>http://localhost/c2c-custom-php/full-room</loc></url>
-  <url><loc>http://localhost/c2c-custom-php/portfolio</loc></url>
-  <url><loc>http://localhost/c2c-custom-php/process</loc></url>
-  <url><loc>http://localhost/c2c-custom-php/articles</loc></url>
-  <url><loc>http://localhost/c2c-custom-php/reviews</loc></url>
-  <url><loc>http://localhost/c2c-custom-php/contact</loc></url>
+  <url><loc>http://ceiling2cellar.com/</loc></url>
+  <url><loc>http://ceiling2cellar.com/about</loc></url>
+  <url><loc>http://ceiling2cellar.com/services</loc></url>
+  <url><loc>http://ceiling2cellar.com/basement</loc></url>
+  <url><loc>http://ceiling2cellar.com/kitchen</loc></url>
+  <url><loc>http://ceiling2cellar.com/bathroom</loc></url>
+  <url><loc>http://ceiling2cellar.com/full-room</loc></url>
+  <url><loc>http://ceiling2cellar.com/portfolio</loc></url>
+  <url><loc>http://ceiling2cellar.com/process</loc></url>
+  <url><loc>http://ceiling2cellar.com/articles</loc></url>
+  <url><loc>http://ceiling2cellar.com/reviews</loc></url>
+  <url><loc>http://ceiling2cellar.com/contact</loc></url>
 </urlset>
