@@ -12,8 +12,8 @@ define('BUSINESS_ADDRESS', 'Western New York');
 // Hostinger SMTP
 define('SMTP_ENABLED', true);
 define('SMTP_HOST', 'smtp.hostinger.com');
-define('SMTP_PORT', 587);
-define('SMTP_ENCRYPTION', 'tls');
+define('SMTP_PORT', 465);
+define('SMTP_ENCRYPTION', 'ssl');
 define('SMTP_USERNAME', 'info@ceiling2cellar.com');
 define('SMTP_PASSWORD', 'Celing123#@!');
 define('MAIL_FROM_ADDRESS', 'info@ceiling2cellar.com');
