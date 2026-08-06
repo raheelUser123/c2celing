@@ -5,12 +5,32 @@ require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/integrations/ClickUpClient.php';
 require_once __DIR__ . '/../includes/integrations/SmtpMailer.php';
 
-header('Content-Type: application/json; charset=utf-8');
+function wants_json(): bool
+{
+    $accept = strtolower((string) ($_SERVER['HTTP_ACCEPT'] ?? ''));
+    $requestedWith = strtolower((string) ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? ''));
+    return str_contains($accept, 'application/json') || $requestedWith === 'xmlhttprequest';
+}
 
 function json_response(int $status, array $payload): never
 {
-    http_response_code($status);
-    echo json_encode($payload, JSON_UNESCAPED_SLASHES);
+    if (wants_json()) {
+        http_response_code($status);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($payload, JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    if (($payload['ok'] ?? false) === true) {
+        $location = (string) ($payload['redirect'] ?? url('thanks-consult.php'));
+        header('Location: ' . $location, true, 303);
+        exit;
+    }
+
+    $message = rawurlencode((string) ($payload['message'] ?? 'Submission failed. Please try again.'));
+    $referer = (string) ($_SERVER['HTTP_REFERER'] ?? url('contact.php'));
+    $separator = str_contains($referer, '?') ? '&' : '?';
+    header('Location: ' . $referer . $separator . 'form_error=' . $message, true, 303);
     exit;
 }
 
@@ -245,22 +265,21 @@ try {
     log_event('customer_email_error', ['lead_id' => $leadId, 'error' => $e->getMessage()]);
 }
 
-// The lead has already been saved locally. Integration failures are logged but
-// must not make the visitor believe the form itself failed or create duplicates.
-log_event('lead_complete', [
-    'lead_id' => $leadId,
-    'clickup_ok' => $clickUpTaskId !== '',
-    'admin_email_ok' => !in_array(true, array_map(static fn(string $v): bool => str_starts_with($v, 'admin:'), $emailErrors), true),
-    'customer_email_ok' => !in_array(true, array_map(static fn(string $v): bool => str_starts_with($v, 'customer:'), $emailErrors), true),
-]);
+// A lead is never discarded. It is always saved locally first. In production,
+// report integration failures so the visitor can retry and the team can inspect logs.
+$integrationFailed = (CLICKUP_ENABLED && $clickUpTaskId === '') || (SMTP_ENABLED && count($emailErrors) === 2);
+if ($integrationFailed && APP_ENV === 'production') {
+    json_response(503, [
+        'ok' => false,
+        'message' => 'Your details were saved, but delivery is temporarily delayed. Please call ' . BUSINESS_PHONE . ' or try again in a few minutes.',
+        'lead_id' => $leadId,
+    ]);
+}
 
 json_response(200, [
     'ok' => true,
     'lead_id' => $leadId,
     'redirect' => url($mode === 'estimate' ? 'thanks-estimate.php' : 'thanks-consult.php'),
-    'integration_warning' => ($clickUpError !== '' || $emailErrors !== [])
-        ? 'Lead saved. One or more background integrations need attention in storage/logs.'
-        : '',
     'debug' => DEBUG_MODE ? [
         'clickup_task_id' => $clickUpTaskId,
         'clickup_error' => $clickUpError,

@@ -103,37 +103,32 @@ document.documentElement.classList.add('js');
   }
 
   document.querySelectorAll('[data-file-input]').forEach(input=>input.addEventListener('change',()=>{const target=input.closest('label')?.querySelector('[data-file-summary]');if(!target)return;const files=[...input.files];target.textContent=files.length?`${files.length} file${files.length===1?'':'s'} selected: ${files.map(f=>f.name).join(', ')}`:'';}));
-  document.querySelectorAll('[data-ajax-form]').forEach(form => form.addEventListener('submit', async event => {
-    event.preventDefault();
-    const msg = form.querySelector('.form-message');
-    const btn = form.querySelector('button[type="submit"]');
-    if (!btn) { form.submit(); return; }
-    if (msg) { msg.className = 'form-message'; msg.textContent = ''; }
-    btn.disabled = true;
-    const old = btn.innerHTML;
-    btn.textContent = 'Submitting...';
-    try {
-      const response = await fetch(form.action, {
-        method: 'POST',
-        body: new FormData(form),
-        headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-        credentials: 'same-origin'
-      });
-      const raw = await response.text();
-      let data;
-      try { data = JSON.parse(raw); }
-      catch (_) { throw new Error('Server returned an invalid response. Check storage/logs and the Hostinger PHP error log.'); }
-      if (!response.ok || !data.ok) throw new Error(data.message || `Submission failed (${response.status}).`);
-      if (msg) { msg.className = 'form-message success-text'; msg.textContent = 'Submitted successfully. Redirecting...'; }
-      window.location.href = data.redirect || form.dataset.successUrl || '/';
-    } catch (error) {
-      if (msg) { msg.className = 'form-message error-text'; msg.textContent = error.message || 'Something went wrong. Please call us.'; }
-      btn.disabled = false;
-      btn.innerHTML = old;
-    }
-  }));
+  // Forms submit natively to PHP. This avoids fetch/cache/proxy issues on shared hosting.
+  document.querySelectorAll('.c2c-lead-form').forEach(form => {
+    form.addEventListener('submit', e => {
+      const btn = form.querySelector('button[type="submit"]');
+      const msg = form.querySelector('.form-message');
+      if (!form.checkValidity()) {
+        e.preventDefault();
+        form.reportValidity();
+        if (msg) {
+          msg.className = 'form-message error-text';
+          msg.textContent = 'Please complete all required fields.';
+        }
+        return;
+      }
+      if (btn) {
+        btn.disabled = true;
+        btn.dataset.originalText = btn.textContent || '';
+        btn.textContent = 'Submitting...';
+      }
+      if (msg) {
+        msg.className = 'form-message';
+        msg.textContent = 'Submitting your request securely...';
+      }
+    });
+  });
   document.querySelectorAll('.intent-tabs button').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.intent-tabs button').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.intent-panel').forEach(x=>x.classList.remove('active'));btn.classList.add('active');document.querySelector(`[data-panel="${btn.dataset.tab}"]`)?.classList.add('active');}));
   document.querySelectorAll('.filter-bar button').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.filter-bar button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('.portfolio-grid article').forEach(card=>card.hidden=btn.dataset.filter!=='all'&&card.dataset.category!==btn.dataset.filter);}));
   document.querySelectorAll('input[type="tel"]').forEach(input=>input.addEventListener('input',()=>{let n=input.value.replace(/\D/g,'').slice(0,10);input.value=n.length>6?`(${n.slice(0,3)}) ${n.slice(3,6)}-${n.slice(6)}`:n.length>3?`(${n.slice(0,3)}) ${n.slice(3)}`:n;}));
 })();
-

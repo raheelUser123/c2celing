@@ -1,5 +1,5 @@
 <?php $mode=$mode??'consult'; $selected=$selected??''; ?>
-<form class="c2c-lead-form multi-step-wizard" action="<?=e(url('handlers/submit-lead.php'))?>" method="post" enctype="multipart/form-data" data-ajax-form data-multi-step-form novalidate>
+<form class="c2c-lead-form multi-step-wizard" action="<?=e(url('handlers/submit-lead.php'))?>" method="post" enctype="multipart/form-data" data-multi-step-form>
   <input type="hidden" name="mode" value="<?=e($mode)?>">
   <input type="hidden" name="page_url" value="<?=e((isset($_SERVER['HTTPS'])?'https':'http').'://'.($_SERVER['HTTP_HOST']??'localhost').($_SERVER['REQUEST_URI']??'/'))?>">
   <div class="hp-field" aria-hidden="true"><label>Company website<input name="company_website" tabindex="-1" autocomplete="off"></label></div>
