@@ -2,11 +2,10 @@
 declare(strict_types=1);
 
 /**
- * Ceiling 2 Cellar server configuration.
- *
- * Put real SMTP and ClickUp credentials in config.local.php only.
- * Copy config.local.example.php to config.local.php and replace placeholders.
+ * Ceiling 2 Cellar Server Configuration.
+ * Contains direct Hostinger SMTP and ClickUp integration settings.
  */
+
 $localConfig = __DIR__ . '/config.local.php';
 if (is_file($localConfig)) {
     require $localConfig;
@@ -23,7 +22,7 @@ if (!defined('SITE_NAME')) define('SITE_NAME', env_value('SITE_NAME', 'Ceiling 2
 if (!defined('SITE_URL')) define('SITE_URL', env_value('SITE_URL', 'http://localhost/c2c-custom-php'));
 if (!defined('BUSINESS_PHONE')) define('BUSINESS_PHONE', env_value('BUSINESS_PHONE', '(716) 555-0123'));
 if (!defined('BUSINESS_PHONE_RAW')) define('BUSINESS_PHONE_RAW', env_value('BUSINESS_PHONE_RAW', '+17165550123'));
-if (!defined('BUSINESS_EMAIL')) define('BUSINESS_EMAIL', env_value('BUSINESS_EMAIL', 'hello@ceiling2cellar.com'));
+if (!defined('BUSINESS_EMAIL')) define('BUSINESS_EMAIL', env_value('BUSINESS_EMAIL', 'info@ceiling2cellar.com'));
 if (!defined('SERVICE_AREA')) define('SERVICE_AREA', env_value('SERVICE_AREA', 'Western New York'));
 if (!defined('BUSINESS_ADDRESS')) define('BUSINESS_ADDRESS', env_value('BUSINESS_ADDRESS', 'Western New York'));
 if (!defined('FORM_RATE_LIMIT_SECONDS')) define('FORM_RATE_LIMIT_SECONDS', (int) env_value('FORM_RATE_LIMIT_SECONDS', '20'));
@@ -32,29 +31,29 @@ if (!defined('MAX_UPLOAD_FILES')) define('MAX_UPLOAD_FILES', (int) env_value('MA
 if (!defined('UPLOAD_DIR')) define('UPLOAD_DIR', __DIR__ . '/uploads');
 if (!defined('STORAGE_DIR')) define('STORAGE_DIR', __DIR__ . '/storage');
 
-// SMTP placeholders
-if (!defined('SMTP_HOST')) define('SMTP_HOST', env_value('SMTP_HOST', 'smtp.your-email-provider.com'));
-if (!defined('SMTP_PORT')) define('SMTP_PORT', (int) env_value('SMTP_PORT', '587'));
-if (!defined('SMTP_ENCRYPTION')) define('SMTP_ENCRYPTION', env_value('SMTP_ENCRYPTION', 'tls'));
-if (!defined('SMTP_USERNAME')) define('SMTP_USERNAME', env_value('SMTP_USERNAME', 'forms@ceiling2cellar.com'));
-if (!defined('SMTP_PASSWORD')) define('SMTP_PASSWORD', env_value('SMTP_PASSWORD', 'REPLACE_WITH_SMTP_PASSWORD'));
-if (!defined('MAIL_FROM_ADDRESS')) define('MAIL_FROM_ADDRESS', env_value('MAIL_FROM_ADDRESS', 'forms@ceiling2cellar.com'));
+// Hostinger SMTP Credentials
+if (!defined('SMTP_HOST')) define('SMTP_HOST', env_value('SMTP_HOST', 'smtp.hostinger.com'));
+if (!defined('SMTP_PORT')) define('SMTP_PORT', (int) env_value('SMTP_PORT', '465'));
+if (!defined('SMTP_ENCRYPTION')) define('SMTP_ENCRYPTION', env_value('SMTP_ENCRYPTION', 'ssl'));
+if (!defined('SMTP_USERNAME')) define('SMTP_USERNAME', env_value('SMTP_USERNAME', 'info@ceiling2cellar.com'));
+if (!defined('SMTP_PASSWORD')) define('SMTP_PASSWORD', env_value('SMTP_PASSWORD', 'Celing123#@!'));
+if (!defined('MAIL_FROM_ADDRESS')) define('MAIL_FROM_ADDRESS', env_value('MAIL_FROM_ADDRESS', 'info@ceiling2cellar.com'));
 if (!defined('MAIL_FROM_NAME')) define('MAIL_FROM_NAME', env_value('MAIL_FROM_NAME', 'Ceiling 2 Cellar Website'));
-if (!defined('MAIL_TO_ADDRESS')) define('MAIL_TO_ADDRESS', env_value('MAIL_TO_ADDRESS', 'leads@ceiling2cellar.com'));
+if (!defined('MAIL_TO_ADDRESS')) define('MAIL_TO_ADDRESS', env_value('MAIL_TO_ADDRESS', 'info@ceiling2cellar.com'));
 if (!defined('MAIL_TO_NAME')) define('MAIL_TO_NAME', env_value('MAIL_TO_NAME', 'Ceiling 2 Cellar Team'));
-if (!defined('MAIL_REPLY_TO')) define('MAIL_REPLY_TO', env_value('MAIL_REPLY_TO', BUSINESS_EMAIL));
+if (!defined('MAIL_REPLY_TO')) define('MAIL_REPLY_TO', env_value('MAIL_REPLY_TO', 'info@ceiling2cellar.com'));
 if (!defined('SMTP_ENABLED')) define('SMTP_ENABLED', env_value('SMTP_ENABLED', '1') === '1');
 
-// ClickUp placeholders
+// ClickUp Integration Credentials
 if (!defined('CLICKUP_ENABLED')) define('CLICKUP_ENABLED', env_value('CLICKUP_ENABLED', '1') === '1');
-if (!defined('CLICKUP_API_TOKEN')) define('CLICKUP_API_TOKEN', env_value('CLICKUP_API_TOKEN', 'REPLACE_WITH_CLICKUP_API_TOKEN'));
-if (!defined('CLICKUP_LIST_ID')) define('CLICKUP_LIST_ID', env_value('CLICKUP_LIST_ID', 'REPLACE_WITH_CLICKUP_LIST_ID'));
+if (!defined('CLICKUP_API_TOKEN')) define('CLICKUP_API_TOKEN', env_value('CLICKUP_API_TOKEN', 'pk_87315537_KLOCR5UYJQE40QBQCZZ06WXGOR2GGVUS'));
+if (!defined('CLICKUP_LIST_ID')) define('CLICKUP_LIST_ID', env_value('CLICKUP_LIST_ID', '901715880570'));
 if (!defined('CLICKUP_DEFAULT_ASSIGNEE_ID')) define('CLICKUP_DEFAULT_ASSIGNEE_ID', env_value('CLICKUP_DEFAULT_ASSIGNEE_ID', ''));
 if (!defined('CLICKUP_DEFAULT_TAG')) define('CLICKUP_DEFAULT_TAG', env_value('CLICKUP_DEFAULT_TAG', 'c2c-website-lead'));
 if (!defined('CLICKUP_STATUS')) define('CLICKUP_STATUS', env_value('CLICKUP_STATUS', ''));
 if (!defined('CLICKUP_PRIORITY')) define('CLICKUP_PRIORITY', (int) env_value('CLICKUP_PRIORITY', '3'));
 
-// Optional ClickUp custom field IDs. Leave blank when not configured in the List.
+// Optional ClickUp custom field IDs
 if (!defined('CLICKUP_FIELD_SERVICE')) define('CLICKUP_FIELD_SERVICE', env_value('CLICKUP_FIELD_SERVICE', ''));
 if (!defined('CLICKUP_FIELD_BUDGET')) define('CLICKUP_FIELD_BUDGET', env_value('CLICKUP_FIELD_BUDGET', ''));
 if (!defined('CLICKUP_FIELD_SOURCE')) define('CLICKUP_FIELD_SOURCE', env_value('CLICKUP_FIELD_SOURCE', ''));
