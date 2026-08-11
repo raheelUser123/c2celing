@@ -1,5 +1,43 @@
-<?php $pageTitle='Client Reviews'; $pageDescription='The C2C review system is ready for real, verifiable homeowner feedback.'; require 'includes/header.php'; ?>
-<section class="page-hero simple"><div class="container narrow"><span class="eyebrow dark">CLIENT REVIEWS</span><h1>Real homeowner feedback will appear here after verification.</h1><p>We do not publish fabricated testimonials or ratings. This page is built and ready for approved reviews as they become available.</p></div></section>
-<section class="section"><div class="container empty-review"><span><?=icon('sparkles')?></span><h2>Review collection is being prepared.</h2><p>Future reviews will identify the project type, location, quote, and source where appropriate.</p><a class="btn btn-primary" href="<?=e(url('portfolio.php'))?>">Explore our work structure</a></div></section>
-<section class="section bg-mist"><div class="container"><div class="centered section-heading"><span class="eyebrow dark">WHAT WE WILL PUBLISH</span><h2>Useful feedback with enough context to be credible.</h2></div><div class="grid-3 fit-grid"><article><h3>Project context</h3><p>The room and general scope connected to the review.</p></article><article><h3>Verifiable source</h3><p>The platform or direct customer authorization supporting publication.</p></article><article><h3>Plain language</h3><p>The homeowner's actual experience without invented performance claims.</p></article></div></div></section>
+<?php 
+$pageTitle = 'Client Reviews'; 
+$pageDescription = 'Real feedback from businesses and homeowners we support across Western New York.'; 
+require 'includes/header.php'; 
+?>
+
+<section class="page-hero simple">
+  <div class="container narrow">
+    <span class="eyebrow dark">CLIENT REVIEWS</span>
+    <h1>Real homeowner & business feedback.</h1>
+    <p>We do not publish fabricated testimonials or ratings. Browse verified experiences from homeowners and clients we have supported across Western New York.</p>
+  </div>
+</section>
+
+<?php require __DIR__ . '/includes/reviews-carousel.php'; ?>
+
+<section class="section bg-mist">
+  <div class="container">
+    <div class="centered section-heading">
+      <span class="eyebrow dark">OUR VERIFICATION STANDARDS</span>
+      <h2>Useful feedback with enough context to be credible.</h2>
+    </div>
+    <div class="grid-3 fit-grid">
+      <article>
+        <h3>Project context</h3>
+        <p>The room, scope, and specific remodeling goals connected to each review.</p>
+      </article>
+      <article>
+        <h3>Verifiable source</h3>
+        <p>Direct customer authorization supporting publication without fabricated scores.</p>
+      </article>
+      <article>
+        <h3>Plain language</h3>
+        <p>The customer's actual experience without invented marketing performance claims.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
 <?php require 'includes/footer.php'; ?>
+
+
+

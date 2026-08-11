@@ -131,4 +131,149 @@ document.documentElement.classList.add('js');
   document.querySelectorAll('.intent-tabs button').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.intent-tabs button').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.intent-panel').forEach(x=>x.classList.remove('active'));btn.classList.add('active');document.querySelector(`[data-panel="${btn.dataset.tab}"]`)?.classList.add('active');}));
   document.querySelectorAll('.filter-bar button').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.filter-bar button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('.portfolio-grid article').forEach(card=>card.hidden=btn.dataset.filter!=='all'&&card.dataset.category!==btn.dataset.filter);}));
   document.querySelectorAll('input[type="tel"]').forEach(input=>input.addEventListener('input',()=>{let n=input.value.replace(/\D/g,'').slice(0,10);input.value=n.length>6?`(${n.slice(0,3)}) ${n.slice(3,6)}-${n.slice(6)}`:n.length>3?`(${n.slice(0,3)}) ${n.slice(3)}`:n;}));
+
+  // Reviews Carousel Logic
+  const initReviewsCarousel = () => {
+    const wrapper = document.querySelector('#reviewsCarousel');
+    if (!wrapper) return;
+
+    const track = wrapper.querySelector('.reviews-carousel-track');
+    const cards = track ? Array.from(track.querySelectorAll('.review-card')) : [];
+    const prevBtn = wrapper.querySelector('.carousel-btn.prev');
+    const nextBtn = wrapper.querySelector('.carousel-btn.next');
+    const dotsContainer = wrapper.querySelector('.carousel-dots');
+
+    if (!track || cards.length === 0) return;
+
+    let currentIndex = 0;
+    let autoplayTimer = null;
+
+    const getVisibleCount = () => {
+      if (window.innerWidth <= 640) return 1;
+      if (window.innerWidth <= 992) return 2;
+      return 3;
+    };
+
+    const getMaxIndex = () => {
+      return Math.max(0, cards.length - getVisibleCount());
+    };
+
+    const updateButtons = () => {
+      if (prevBtn) prevBtn.disabled = currentIndex === 0;
+      if (nextBtn) nextBtn.disabled = currentIndex >= getMaxIndex();
+    };
+
+    const renderDots = () => {
+      if (!dotsContainer) return;
+      dotsContainer.innerHTML = '';
+      const maxIdx = getMaxIndex();
+      for (let i = 0; i <= maxIdx; i++) {
+        const dot = document.createElement('button');
+        dot.className = `carousel-dot ${i === currentIndex ? 'active' : ''}`;
+        dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+        dot.addEventListener('click', () => {
+          goToSlide(i);
+          resetAutoplay();
+        });
+        dotsContainer.appendChild(dot);
+      }
+    };
+
+    const goToSlide = (index) => {
+      const maxIdx = getMaxIndex();
+      currentIndex = Math.max(0, Math.min(index, maxIdx));
+      
+      const cardNode = cards[0];
+      const gap = 24;
+      const cardWidth = cardNode.getBoundingClientRect().width;
+      const offset = currentIndex * (cardWidth + gap);
+
+      track.style.transform = `translateX(-${offset}px)`;
+
+      if (dotsContainer) {
+        const dots = Array.from(dotsContainer.children);
+        dots.forEach((dot, idx) => {
+          dot.classList.toggle('active', idx === currentIndex);
+        });
+      }
+      updateButtons();
+    };
+
+    prevBtn?.addEventListener('click', () => {
+      if (currentIndex > 0) {
+        goToSlide(currentIndex - 1);
+      } else {
+        goToSlide(getMaxIndex());
+      }
+      resetAutoplay();
+    });
+
+    nextBtn?.addEventListener('click', () => {
+      if (currentIndex < getMaxIndex()) {
+        goToSlide(currentIndex + 1);
+      } else {
+        goToSlide(0);
+      }
+      resetAutoplay();
+    });
+
+    let startX = 0;
+    let currentX = 0;
+    let isDragging = false;
+
+    track.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+      isDragging = true;
+    }, { passive: true });
+
+    track.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+      currentX = e.touches[0].clientX;
+    }, { passive: true });
+
+    track.addEventListener('touchend', () => {
+      if (!isDragging) return;
+      isDragging = false;
+      const diffX = startX - currentX;
+      if (Math.abs(diffX) > 40) {
+        if (diffX > 0) {
+          if (currentIndex < getMaxIndex()) goToSlide(currentIndex + 1);
+        } else {
+          if (currentIndex > 0) goToSlide(currentIndex - 1);
+        }
+        resetAutoplay();
+      }
+    });
+
+    const startAutoplay = () => {
+      autoplayTimer = setInterval(() => {
+        const maxIdx = getMaxIndex();
+        if (currentIndex >= maxIdx) {
+          goToSlide(0);
+        } else {
+          goToSlide(currentIndex + 1);
+        }
+      }, 5000);
+    };
+
+    const resetAutoplay = () => {
+      clearInterval(autoplayTimer);
+      startAutoplay();
+    };
+
+    wrapper.addEventListener('mouseenter', () => clearInterval(autoplayTimer));
+    wrapper.addEventListener('mouseleave', () => startAutoplay());
+
+    renderDots();
+    updateButtons();
+    startAutoplay();
+
+    window.addEventListener('resize', () => {
+      renderDots();
+      goToSlide(Math.min(currentIndex, getMaxIndex()));
+    });
+  };
+
+  initReviewsCarousel();
 })();
+
