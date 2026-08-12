@@ -31,7 +31,7 @@ require 'includes/header.php';
         <div class="legal-contact-box">
           <p><strong>Green Leaf Eco Development, LLC</strong></p>
           <p>d/b/a Ceiling 2 Cellar Remodeling</p>
-          <p>26 Main St, Suite 1</p>
+          <p>26 Main St, Suite 2</p>
           <p>Middleport, NY 14105</p>
           <p>Phone: <a href="tel:+18337366647">+1 (833) 736-6647</a></p>
           <p>Email: <a href="mailto:info@ceiling2cellar.com">info@ceiling2cellar.com</a></p>
@@ -570,7 +570,7 @@ require 'includes/header.php';
         <div class="legal-contact-box">
           <p><strong>Green Leaf Eco Development, LLC</strong></p>
           <p>d/b/a Ceiling 2 Cellar Remodeling</p>
-          <p>26 Main St, Suite 1</p>
+          <p>26 Main St, Suite 2</p>
           <p>Middleport, NY 14105</p>
           <p>Phone: <a href="tel:+18337366647">+1 (833) 736-6647</a></p>
           <p>Email: <a href="mailto:info@ceiling2cellar.com">info@ceiling2cellar.com</a></p>
