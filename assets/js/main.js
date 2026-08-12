@@ -129,7 +129,27 @@ document.documentElement.classList.add('js');
     });
   });
   document.querySelectorAll('.intent-tabs button').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.intent-tabs button').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.intent-panel').forEach(x=>x.classList.remove('active'));btn.classList.add('active');document.querySelector(`[data-panel="${btn.dataset.tab}"]`)?.classList.add('active');}));
-  document.querySelectorAll('.filter-bar button').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.filter-bar button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('.portfolio-grid article').forEach(card=>card.hidden=btn.dataset.filter!=='all'&&card.dataset.category!==btn.dataset.filter);}));
+  // Portfolio tabs (built from assets/images/projects folders)
+  document.querySelectorAll('.portfolio-tabs').forEach(tabList=>{
+    const panels=document.querySelectorAll('.portfolio-panel');
+    const activate=(btn)=>{
+      tabList.querySelectorAll('.portfolio-tab').forEach(x=>{const on=x===btn;x.classList.toggle('active',on);x.setAttribute('aria-selected',String(on));});
+      panels.forEach(p=>{p.hidden=p.id!==btn.dataset.tab;});
+    };
+    tabList.querySelectorAll('.portfolio-tab').forEach(btn=>btn.addEventListener('click',()=>activate(btn)));
+    tabList.addEventListener('keydown',e=>{
+      const tabs=Array.from(tabList.querySelectorAll('.portfolio-tab'));
+      const idx=tabs.indexOf(document.activeElement);
+      if(idx===-1||!['ArrowRight','ArrowLeft','Home','End'].includes(e.key))return;
+      e.preventDefault();
+      let next=idx;
+      if(e.key==='ArrowRight')next=(idx+1)%tabs.length;
+      if(e.key==='ArrowLeft')next=(idx-1+tabs.length)%tabs.length;
+      if(e.key==='Home')next=0;
+      if(e.key==='End')next=tabs.length-1;
+      tabs[next].focus();activate(tabs[next]);
+    });
+  });
   document.querySelectorAll('input[type="tel"]').forEach(input=>input.addEventListener('input',()=>{let n=input.value.replace(/\D/g,'').slice(0,10);input.value=n.length>6?`(${n.slice(0,3)}) ${n.slice(3,6)}-${n.slice(6)}`:n.length>3?`(${n.slice(0,3)}) ${n.slice(3)}`:n;}));
 
   // Reviews Carousel Logic
